@@ -31,14 +31,21 @@ class MainFragment : Fragment() {
 
         setupRecycler()
 
+        viewModel.navigateToDetailFragment.observe(viewLifecycleOwner) {
+            it?.let {
+                findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
+                viewModel.doneNavigating()
+            }
+        }
+
         setHasOptionsMenu(true)
 
         return binding.root
     }
 
     private fun setupRecycler() {
-        adapter.onItemClicked = {
-            findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
+        adapter.onItemClicked = { item ->
+            viewModel.startNavigating(item)
         }
 
         viewModel.asteroids.observe(viewLifecycleOwner) { data ->

@@ -1,11 +1,12 @@
-package com.abdosharaf.asteroidradar
+package com.abdosharaf.asteroidradar.database
 
-import android.os.Parcelable
-import com.abdosharaf.asteroidradar.database.AsteroidEntity
-import kotlinx.parcelize.Parcelize
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.abdosharaf.asteroidradar.Asteroid
 
-@Parcelize
-data class Asteroid(
+@Entity(tableName = "asteroids_table")
+data class AsteroidEntity(
+    @PrimaryKey
     val id: Long,
     val codename: String,
     val closeApproachDate: String,
@@ -14,11 +15,11 @@ data class Asteroid(
     val relativeVelocity: Double,
     val distanceFromEarth: Double,
     val isPotentiallyHazardous: Boolean,
-) : Parcelable
+)
 
-fun List<Asteroid>.toAsteroidEntities(): List<AsteroidEntity> {
+fun List<AsteroidEntity>.toAsteroidsList(): List<Asteroid> {
     return map {
-        AsteroidEntity(
+        Asteroid(
             id = it.id,
             codename = it.codename,
             closeApproachDate = it.closeApproachDate,

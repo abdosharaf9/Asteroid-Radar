@@ -1,34 +1,36 @@
 package com.abdosharaf.asteroidradar.main
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abdosharaf.asteroidradar.Asteroid
 import com.abdosharaf.asteroidradar.PictureOfDay
+import com.abdosharaf.asteroidradar.database.AsteroidsDatabase
 import com.abdosharaf.asteroidradar.repository.AsteroidsRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val repo = AsteroidsRepository()
+    private val database = AsteroidsDatabase.getInstance(app)
+    private val repo = AsteroidsRepository(database)
 
-    private val _asteroids: MutableLiveData<List<Asteroid>> = MutableLiveData()
-    val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids
+    val asteroids = repo.asteroids
 
     private val _picOfDay: MutableLiveData<PictureOfDay> = MutableLiveData()
     val picOfDay: LiveData<PictureOfDay>
         get() = _picOfDay
 
-    init {
-        getAsteroids()
-        getPicOfDay()
-    }
+    private val _navigateToDetailFragment = MutableLiveData<Asteroid?>(null)
+    val navigateToDetailFragment
+        get() = _navigateToDetailFragment
 
-    private fun getAsteroids() {
-        viewModelScope.launch {
-            _asteroids.value = repo.getAsteroids()
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.refreshAsteroidsData()
+            getPicOfDay()
         }
     }
 
@@ -36,5 +38,13 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             _picOfDay.value = repo.getPicOfTheDay()
         }
+    }
+
+    fun startNavigating(item: Asteroid) {
+        _navigateToDetailFragment.value = item
+    }
+
+    fun doneNavigating() {
+        _navigateToDetailFragment.value = null
     }
 }

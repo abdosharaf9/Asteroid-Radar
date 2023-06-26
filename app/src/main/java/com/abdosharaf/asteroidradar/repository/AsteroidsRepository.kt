@@ -1,18 +1,23 @@
 package com.abdosharaf.asteroidradar.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.abdosharaf.asteroidradar.Asteroid
 import com.abdosharaf.asteroidradar.Constants
 import com.abdosharaf.asteroidradar.api.AsteroidAPIService
 import com.abdosharaf.asteroidradar.api.parseAsteroidsJsonResult
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.abdosharaf.asteroidradar.database.AsteroidsDatabase
+import com.abdosharaf.asteroidradar.database.toAsteroidsList
+import com.abdosharaf.asteroidradar.toAsteroidEntities
 import org.json.JSONObject
 
-class AsteroidsRepository {
+class AsteroidsRepository(private val database: AsteroidsDatabase) {
 
-    // TODO: Get the Asteroids list from the database!!
+    val asteroids: LiveData<List<Asteroid>> = database.dao.getAll().map {
+        it.toAsteroidsList()
+    }
 
-    suspend fun getAsteroids(): List<Asteroid> {
+    private suspend fun getAsteroids(): List<Asteroid> {
         val responseStr = AsteroidAPIService.ApiService.getAsteroids("", "", Constants.API_KEY)
         val responseJson = JSONObject(responseStr)
 
@@ -22,8 +27,7 @@ class AsteroidsRepository {
     suspend fun getPicOfTheDay() = AsteroidAPIService.ApiService.getPictureOfDay(Constants.API_KEY)
 
     suspend fun refreshAsteroidsData() {
-        withContext(Dispatchers.IO) {
-            // TODO: Get data from the API and insert it into the database!!
-        }
+        val asteroids = getAsteroids()
+        database.dao.insertAll(asteroids.toAsteroidEntities())
     }
 }
