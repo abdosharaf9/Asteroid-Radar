@@ -4,6 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
@@ -45,7 +46,11 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
 fun ImageView.bindPictureOfTheDay(picture: PictureOfDay?) {
     picture?.let {
         if (it.mediaType == "image") {
-            Glide.with(this.context).load(it.url).into(this)
+            Glide.with(this.context).load(it.url).apply(
+                RequestOptions()
+                    .placeholder(R.drawable.loading_animation)
+                    .error(R.drawable.ic_broken_image)
+            ).into(this)
             this.contentDescription = this.resources.getString(
                 R.string.nasa_picture_of_day_content_description_format, it.title
             )

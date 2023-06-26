@@ -18,13 +18,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        Properties properties = new Properties()
-        if(rootProject.file("local.properties").exists()){
-            properties.load(rootProject.file("local.properties").newDataInputStream())
-        }
-
-        resValue "string", "api_key", properties.getProperty("api_key", "DEMO_KEY")
+        buildConfigField "String", "API_KEY", "\"" + getApiKey() + "\""
     }
 
     buildTypes {
@@ -41,8 +35,20 @@ android {
         jvmTarget = '17'
     }
     buildFeatures {
+        buildConfig = true
         dataBinding true
     }
+}
+
+def getApiKey() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+    String apiKey = properties.getProperty("api_key")
+    if (apiKey == null)
+        throw new GradleException("")
+
+    return apiKey
 }
 
 dependencies {
