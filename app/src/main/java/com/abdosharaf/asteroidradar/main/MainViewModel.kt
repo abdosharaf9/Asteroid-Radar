@@ -1,7 +1,6 @@
 package com.abdosharaf.asteroidradar.main
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +10,6 @@ import com.abdosharaf.asteroidradar.PictureOfDay
 import com.abdosharaf.asteroidradar.database.AsteroidsDatabase
 import com.abdosharaf.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -35,13 +33,16 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 getPicOfDay()
             }
         } catch (e: Exception) {
-            Log.e("TAG", "$e")
-            Log.e("TAG", "${e.printStackTrace()}")
+            e.printStackTrace()
         }
     }
 
     private suspend fun getPicOfDay() {
-        _picOfDay.value = repo.getPicOfTheDay()
+        try {
+            _picOfDay.value = repo.getPicOfTheDay()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun startNavigating(item: Asteroid) {

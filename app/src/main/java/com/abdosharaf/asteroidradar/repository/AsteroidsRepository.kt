@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import com.abdosharaf.asteroidradar.Asteroid
 import com.abdosharaf.asteroidradar.BuildConfig
-import com.abdosharaf.asteroidradar.Constants
 import com.abdosharaf.asteroidradar.api.AsteroidAPIService
 import com.abdosharaf.asteroidradar.api.parseAsteroidsJsonResult
 import com.abdosharaf.asteroidradar.database.AsteroidsDatabase
@@ -31,9 +30,13 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
         AsteroidAPIService.ApiService.getPictureOfDay(BuildConfig.API_KEY)
 
     suspend fun refreshAsteroidsData() {
-        withContext(Dispatchers.IO) {
-            val asteroids = getAsteroids()
-            database.dao.insertAll(asteroids.toAsteroidEntities())
+        try {
+            withContext(Dispatchers.IO) {
+                val asteroids = getAsteroids()
+                database.dao.insertAll(asteroids.toAsteroidEntities())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

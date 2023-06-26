@@ -34,12 +34,8 @@ class AsteroidApplication : Application() {
             }
             .build()
 
-        /*val timeUnit = TimeUnit.DAYS
-        val interval: Long = 1*/
-
-        // TODO: Remove this after testing!!
-        val timeUnit = TimeUnit.SECONDS
-        val interval: Long = 30
+        val timeUnit = TimeUnit.DAYS
+        val interval: Long = 1
 
         val periodicWork = PeriodicWorkRequestBuilder<AsteroidsWorker>(interval, timeUnit)
             .setConstraints(constraints)
